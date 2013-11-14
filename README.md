@@ -6,4 +6,4 @@ RubyMotion port of Ray Wenderlich's tutorials
 
 ## Resources
 Download resources from the original tutorial pages.
-Extract them and move to `resources/{images/sounds}`.
+Extract them and move to `resources/{images,sounds}`.
