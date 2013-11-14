@@ -16,6 +16,9 @@ class GameScene < SKScene
   SHIP_SIZE = CGSizeMake(30, 16)
   SHIP_NAME = "ship".freeze
 
+  SCORE_HUD_NAME  = "score_hud".freeze
+  HEALTH_HUD_NAME = "health_hud".freeze
+
   def didMoveToView(view)
     unless @contentCreated
       self.createContent
@@ -26,6 +29,7 @@ class GameScene < SKScene
   def createContent
     setup_invaders
     setup_ship
+    setup_hud
   end
 
   def make_invader_of_type(invader_type)
@@ -80,6 +84,24 @@ class GameScene < SKScene
     ship = SKSpriteNode.spriteNodeWithColor(SKColor.greenColor, size: SHIP_SIZE)
     ship.name = SHIP_NAME
     ship
+  end
+
+  def setup_hud
+    score_label = SKLabelNode.labelNodeWithFontNamed("Courier")
+    score_label.name = SCORE_HUD_NAME
+    score_label.fontSize = 15
+    score_label.fontColor = SKColor.greenColor
+    score_label.text = "Score: %4d" % 0
+    score_label.position = CGPointMake(20 + score_label.frame.size.width / 2, self.size.height - (20 + score_label.frame.size.height / 2))
+    self.addChild(score_label)
+
+    health_label = SKLabelNode.labelNodeWithFontNamed("Courier")
+    health_label.name = HEALTH_HUD_NAME
+    health_label.fontSize = 15
+    health_label.fontColor = SKColor.redColor
+    health_label.text = "Health: %.1f%%" % 100.0
+    health_label.position = CGPointMake(self.size.width - health_label.frame.size.width / 2 - 20, self.size.height - (20 + health_label.frame.size.height / 2))
+    self.addChild(health_label)
   end
 
   def update(currentTime)
