@@ -13,6 +13,9 @@ class GameScene < SKScene
 
   INVADER_NAME = "invader".freeze
 
+  SHIP_SIZE = CGSizeMake(30, 16)
+  SHIP_NAME = "ship".freeze
+
   def didMoveToView(view)
     unless @contentCreated
       self.createContent
@@ -22,6 +25,7 @@ class GameScene < SKScene
 
   def createContent
     setup_invaders
+    setup_ship
   end
 
   def make_invader_of_type(invader_type)
@@ -64,6 +68,18 @@ class GameScene < SKScene
         invader_position.x += INVADER_SIZE.width + INVADER_GRID_SPACING.width
       end
     end
+  end
+
+  def setup_ship
+    ship = self.make_ship
+    ship.position = CGPointMake(self.size.width / 2.0, SHIP_SIZE.height / 2.0)
+    self.addChild(ship)
+  end
+
+  def make_ship
+    ship = SKSpriteNode.spriteNodeWithColor(SKColor.greenColor, size: SHIP_SIZE)
+    ship.name = SHIP_NAME
+    ship
   end
 
   def update(currentTime)
