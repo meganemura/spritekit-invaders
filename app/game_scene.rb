@@ -6,6 +6,14 @@ class GameScene < SKScene
     INVADER_TYPE_C = 3
   end
 
+  module InvaderMovementDirection
+    RIGHT           = 1
+    LEFT            = 2
+    DOWN_THEN_RIGHT = 3
+    DOWN_THEN_LEFT  = 4
+    NONE            = 5
+  end
+
   INVADER_SIZE          = CGSizeMake(24, 16)
   INVADER_GRID_SPACING  = CGSizeMake(12, 12)
   INVADER_ROW_COUNT     = 6
@@ -27,6 +35,10 @@ class GameScene < SKScene
   end
 
   def createContent
+    @invader_movement_direction = InvaderMovementDirection::RIGHT
+    @time_per_move = 1.0
+    @time_of_last_move = 0.0
+
     setup_invaders
     setup_ship
     setup_hud
@@ -92,7 +104,10 @@ class GameScene < SKScene
     score_label.fontSize = 15
     score_label.fontColor = SKColor.greenColor
     score_label.text = "Score: %4d" % 0
-    score_label.position = CGPointMake(20 + score_label.frame.size.width / 2, self.size.height - (20 + score_label.frame.size.height / 2))
+    score_label.position = CGPointMake(
+      20 + score_label.frame.size.width / 2,
+      self.size.height - (20 + score_label.frame.size.height / 2)
+    )
     self.addChild(score_label)
 
     health_label = SKLabelNode.labelNodeWithFontNamed("Courier")
@@ -100,11 +115,33 @@ class GameScene < SKScene
     health_label.fontSize = 15
     health_label.fontColor = SKColor.redColor
     health_label.text = "Health: %.1f%%" % 100.0
-    health_label.position = CGPointMake(self.size.width - health_label.frame.size.width / 2 - 20, self.size.height - (20 + health_label.frame.size.height / 2))
+    health_label.position = CGPointMake(
+      self.size.width - health_label.frame.size.width / 2 - 20,
+      self.size.height - (20 + health_label.frame.size.height / 2)
+    )
     self.addChild(health_label)
   end
 
   def update(currentTime)
+    self.move_invaders_for_update(currentTime)
+  end
+
+  def move_invaders_for_update(current_time)
+    return if current_time - @time_of_last_move < @time_per_move
+
+    self.enumerateChildNodesWithName(INVADER_NAME, usingBlock: lambda { |node, stop|
+      case @invader_movement_direction
+      when InvaderMovementDirection::RIGHT
+        node.position = CGPointMake(node.position.x + 10, node.position.y)
+      when InvaderMovementDirection::LEFT
+        node.position = CGPointMake(node.position.x - 10, node.position.y)
+      when InvaderMovementDirection::DOWN_THEN_LEFT, InvaderMovementDirection::DOWN_THEN_RIGHT
+        node.position = CGPointMake(node.position.x, node.position.y - 10)
+      else
+      end
+    })
+
+    @time_of_last_move = current_time
   end
 
 end
