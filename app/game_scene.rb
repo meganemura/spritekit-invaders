@@ -129,6 +129,8 @@ class GameScene < SKScene
   def move_invaders_for_update(current_time)
     return if current_time - @time_of_last_move < @time_per_move
 
+    self.determine_invader_movement_direction
+
     self.enumerateChildNodesWithName(INVADER_NAME, usingBlock: lambda { |node, stop|
       case @invader_movement_direction
       when InvaderMovementDirection::RIGHT
@@ -142,6 +144,40 @@ class GameScene < SKScene
     })
 
     @time_of_last_move = current_time
+
+    nil
+  end
+
+  def determine_invader_movement_direction
+    # for block??
+    propsed_movement_direction = @invader_movement_direction
+
+    self.enumerateChildNodesWithName(INVADER_NAME, usingBlock: lambda {|node, stop|
+      case @invader_movement_direction
+      when InvaderMovementDirection::RIGHT
+        if CGRectGetMaxX(node.frame) >= node.scene.size.width - 1.0
+          propsed_movement_direction = InvaderMovementDirection::DOWN_THEN_LEFT
+          stop = true
+        end
+      when InvaderMovementDirection::LEFT
+        if CGRectGetMinX(node.frame) <= 1.0
+          propsed_movement_direction = InvaderMovementDirection::DOWN_THEN_RIGHT
+          stop = true
+        end
+      when InvaderMovementDirection::DOWN_THEN_LEFT
+        propsed_movement_direction = InvaderMovementDirection::LEFT
+        stop = true
+      when InvaderMovementDirection::DOWN_THEN_RIGHT
+        propsed_movement_direction = InvaderMovementDirection::RIGHT
+        stop = true
+      end
+    })
+
+    if propsed_movement_direction != @invader_movement_direction
+      @invader_movement_direction = propsed_movement_direction
+    end
+
+    nil
   end
 
 end
