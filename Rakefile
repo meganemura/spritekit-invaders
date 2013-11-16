@@ -11,5 +11,5 @@ end
 Motion::Project::App.setup do |app|
   # Use `rake config' to see complete project settings.
   app.name = 'spritekit-invaders'
-  app.frameworks += ["SpriteKit"]
+  app.frameworks += ["SpriteKit", "CoreMotion"]
 end

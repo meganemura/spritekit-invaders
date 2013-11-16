@@ -31,6 +31,9 @@ class GameScene < SKScene
     unless @contentCreated
       self.createContent
       @contentCreated = true
+
+      @moiton_manager = CMMotionManager.alloc.init
+      @moiton_manager.startAccelerometerUpdates
     end
   end
 
@@ -40,6 +43,7 @@ class GameScene < SKScene
     @time_of_last_move = 0.0
 
     setup_invaders
+    self.physicsBody = SKPhysicsBody.bodyWithEdgeLoopFromRect(self.frame)
     setup_ship
     setup_hud
   end
@@ -95,6 +99,12 @@ class GameScene < SKScene
   def make_ship
     ship = SKSpriteNode.spriteNodeWithColor(SKColor.greenColor, size: SHIP_SIZE)
     ship.name = SHIP_NAME
+
+    ship.physicsBody = SKPhysicsBody.bodyWithRectangleOfSize(ship.frame.size)
+    ship.physicsBody.dynamic = true
+    ship.physicsBody.affectedByGravity = false
+    ship.physicsBody.mass = 0.02
+
     ship
   end
 
@@ -123,6 +133,7 @@ class GameScene < SKScene
   end
 
   def update(currentTime)
+    self.process_user_motion_for_update(currentTime)
     self.move_invaders_for_update(currentTime)
   end
 
@@ -146,6 +157,15 @@ class GameScene < SKScene
     @time_of_last_move = current_time
 
     nil
+  end
+
+  def process_user_motion_for_update(current_time)
+    ship = self.childNodeWithName(SHIP_NAME)
+    data = @moiton_manager.accelerometerData
+
+    if data && data.acceleration.x.abs > 0.2
+      ship.physicsBody.applyForce(CGVectorMake(40.0 * data.acceleration.x, 0))
+    end
   end
 
   def determine_invader_movement_direction
